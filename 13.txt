@@ -1,0 +1,94 @@
+Database Schema
+
+-- Employee Table
+CREATE TABLE employee (
+    employee_name VARCHAR(255) PRIMARY KEY,
+    street VARCHAR(255),
+    city VARCHAR(255)
+);
+
+-- Works Table
+CREATE TABLE works (
+    employee_name VARCHAR(255),
+    company_name VARCHAR(255),
+    salary DECIMAL(10, 2),
+    FOREIGN KEY (employee_name) REFERENCES employee(employee_name)
+);
+
+-- Company Table
+CREATE TABLE company (
+    company_name VARCHAR(255) PRIMARY KEY,
+    city VARCHAR(255)
+);
+
+-- Manages Table
+CREATE TABLE manages (
+    employee_name VARCHAR(255),
+    manager_name VARCHAR(255),
+    FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    FOREIGN KEY (manager_name) REFERENCES employee(employee_name)
+);
+
+Queries
+1. Find the names and cities of residence of all employees who work for First Bank Corporation.
+
+SELECT e.employee_name, e.city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.company_name = 'First Bank Corporation';
+
+2. Find all employees in the database who live in the same cities as the companies for which they work.
+
+SELECT e.employee_name
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+JOIN company c ON w.company_name = c.company_name
+WHERE e.city = c.city;
+
+3. Find all employees in the database who do not work for First Bank Corporation.
+
+SELECT e.employee_name
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.company_name != 'First Bank Corporation';
+
+4. Assume that the companies may be located in several cities. Find all companies located in every city in which Small Bank Corporation is located.
+
+To find companies located in every city where "Small Bank Corporation" is located, we first find the cities of "Small Bank Corporation" and then check for companies located in all of these cities.
+
+SELECT c1.company_name
+FROM company c1
+WHERE NOT EXISTS (
+    SELECT city
+    FROM company c2
+    WHERE c2.company_name = 'Small Bank Corporation'
+    AND NOT EXISTS (
+        SELECT 1
+        FROM company c3
+        WHERE c3.company_name = c1.company_name
+        AND c3.city = c2.city
+    )
+);
+
+5. Find the company that has the most employees.
+
+To find the company with the most employees, count the number of employees per company and sort by this count in descending order.
+
+SELECT w.company_name
+FROM works w
+GROUP BY w.company_name
+ORDER BY COUNT(w.employee_name) DESC
+LIMIT 1;
+
+6. Find those companies whose employees earn a higher salary, on average, than the average salary at First Bank Corporation.
+
+To do this, first calculate the average salary at "First Bank Corporation," then compare it with the average salary of other companies.
+
+SELECT w1.company_name
+FROM works w1
+GROUP BY w1.company_name
+HAVING AVG(w1.salary) > (
+    SELECT AVG(w2.salary)
+    FROM works w2
+    WHERE w2.company_name = 'First Bank Corporation'
+);

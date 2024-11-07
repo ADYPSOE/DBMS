@@ -1,0 +1,91 @@
+1. Create a Collection Named books
+
+To create a collection in MongoDB, simply insert a document into it, and MongoDB will automatically create the collection.
+
+db.createCollection("books");
+
+2. Insert 5 Records with Fields TITLE, DESCRIPTION, BY, URL, TAGS, and LIKES
+
+db.books.insertMany([
+    {
+        TITLE: "Learn MongoDB",
+        DESCRIPTION: "Introduction to MongoDB and its features.",
+        BY: "john",
+        URL: "http://example.com/mongodb",
+        TAGS: ["database", "NoSQL"],
+        LIKES: 120
+    },
+    {
+        TITLE: "MongoDB Guide",
+        DESCRIPTION: "Comprehensive guide to MongoDB.",
+        BY: "alice",
+        URL: "http://example.com/mongodb-guide",
+        TAGS: ["database", "guide"],
+        LIKES: 200
+    },
+    {
+        TITLE: "Introduction to Databases",
+        DESCRIPTION: "Basics of databases and data management.",
+        BY: "john",
+        URL: "http://example.com/databases",
+        TAGS: ["database", "SQL", "NoSQL"],
+        LIKES: 90
+    },
+    {
+        TITLE: "Advanced MongoDB",
+        DESCRIPTION: "Advanced topics in MongoDB.",
+        BY: "jane",
+        URL: "http://example.com/advanced-mongodb",
+        TAGS: ["database", "NoSQL", "advanced"],
+        LIKES: 300
+    },
+    {
+        TITLE: "MongoDB vs SQL",
+        DESCRIPTION: "Comparison between MongoDB and SQL databases.",
+        BY: "mike",
+        URL: "http://example.com/mongodb-vs-sql",
+        TAGS: ["comparison", "database", "NoSQL", "SQL"],
+        LIKES: 175
+    }
+]);
+
+3. Insert One More Document with Additional Fields user_name and comments
+
+db.books.insertOne({
+    TITLE: "Mastering MongoDB",
+    DESCRIPTION: "A deep dive into MongoDB for experts.",
+    BY: "john",
+    URL: "http://example.com/mastering-mongodb",
+    TAGS: ["database", "NoSQL", "mastery"],
+    LIKES: 250,
+    user_name: "john_doe",
+    comments: ["Great book!", "Highly recommended."]
+});
+
+4. Display All Documents Written by 'john' or Whose Title is 'mongodb'
+
+db.books.find({
+    $or: [
+        { BY: "john" },
+        { TITLE: "mongodb" }
+    ]
+});
+
+5. Display All Documents Whose LIKES is Greater Than 150
+
+db.books.find({ LIKES: { $gt: 150 } });
+
+6. Update the Title of the Document with TITLE as 'mongodb' to 'mongodb overview'
+
+db.books.updateOne(
+    { TITLE: "mongodb" },
+    { $set: { TITLE: "mongodb overview" } }
+);
+
+7. Display Exactly Two Documents Written by 'john'
+
+db.books.find({ BY: "john" }).limit(2);
+
+8. Display All Books in Sorted Fashion (by TITLE in Ascending Order)
+
+db.books.find().sort({ TITLE: 1 });

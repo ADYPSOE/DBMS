@@ -1,0 +1,86 @@
+Database Schema
+
+-- Employee Table
+CREATE TABLE employee (
+    employee_name VARCHAR(255) PRIMARY KEY,
+    street VARCHAR(255),
+    city VARCHAR(255)
+);
+
+-- Works Table
+CREATE TABLE works (
+    employee_name VARCHAR(255),
+    company_name VARCHAR(255),
+    salary DECIMAL(10, 2),
+    FOREIGN KEY (employee_name) REFERENCES employee(employee_name)
+);
+
+-- Company Table
+CREATE TABLE company (
+    company_name VARCHAR(255) PRIMARY KEY,
+    city VARCHAR(255)
+);
+
+-- Manages Table
+CREATE TABLE manages (
+    employee_name VARCHAR(255),
+    manager_name VARCHAR(255),
+    FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    FOREIGN KEY (manager_name) REFERENCES employee(employee_name)
+);
+
+Queries
+1. Find the names of all employees who work for First Bank Corporation.
+
+SELECT employee_name
+FROM works
+WHERE company_name = 'First Bank Corporation';
+
+2. Find the names, street addresses, and cities of residence of all employees who work for First Bank Corporation and earn more than $10,000.
+
+SELECT e.employee_name, e.street, e.city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.company_name = 'First Bank Corporation' AND w.salary > 10000;
+
+3. Find all employees in the database who live in the same cities and on the same streets as their managers.
+
+SELECT e.employee_name
+FROM employee e
+JOIN manages m ON e.employee_name = m.employee_name
+JOIN employee mgr ON m.manager_name = mgr.employee_name
+WHERE e.city = mgr.city AND e.street = mgr.street;
+
+4. Find all employees in the database who earn more than each employee of Small Bank Corporation.
+
+To do this, we need to ensure the employee’s salary is greater than the salary of every employee of "Small Bank Corporation".
+
+SELECT w1.employee_name
+FROM works w1
+WHERE w1.salary > ALL (
+    SELECT w2.salary
+    FROM works w2
+    WHERE w2.company_name = 'Small Bank Corporation'
+);
+
+5. Find all employees who earn more than the average salary of all employees of their company.
+
+To find employees whose salary is above the average salary of their company, we can use a subquery to calculate the average salary per company.
+
+SELECT w1.employee_name
+FROM works w1
+WHERE w1.salary > (
+    SELECT AVG(w2.salary)
+    FROM works w2
+    WHERE w2.company_name = w1.company_name
+);
+
+6. Find the company that has the smallest payroll.
+
+To find the company with the smallest payroll, calculate the total salary for each company and select the one with the minimum.
+
+SELECT company_name
+FROM works
+GROUP BY company_name
+ORDER BY SUM(salary) ASC
+LIMIT 1;

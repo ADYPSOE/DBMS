@@ -1,0 +1,103 @@
+Schema Setup
+
+First, let’s create a collection called orders and insert the sample data.
+
+db.createCollection("orders");
+
+db.orders.insertMany([
+    { id: "A1", amount: 400, status: "P" },
+    { id: "B1", amount: 300, status: "D" },
+    { id: "A1", amount: 200, status: "F" },
+    { id: "C1", amount: 200, status: "F" },
+    { id: "B1", amount: 700, status: "P" },
+    { id: "B1", amount: 800, status: "P" }
+]);
+
+Implementing the Queries Using MapReduce
+
+In MongoDB, MapReduce is implemented using the mapReduce() function. This function requires two key components:
+
+    Map function: Groups data by key (in this case, id).
+    Reduce function: Aggregates the values for each key.
+
+1. Find the Sum of Amount of Each Customer Whose Status is "P"
+
+db.orders.mapReduce(
+    function () { // Map function
+        if (this.status === "P") {
+            emit(this.id, this.amount); // Emit customer id as key, amount as value
+        }
+    },
+    function (key, values) { // Reduce function
+        return Array.sum(values); // Sum the amounts for each customer id
+    },
+    {
+        out: "sum_amount_pending"
+    }
+);
+
+// View the results
+db.sum_amount_pending.find();
+
+2. Find the Average Amount of Each Customer
+
+To calculate the average, we need to keep track of both the sum and count of amount values for each id, then compute the average.
+
+db.orders.mapReduce(
+    function () { // Map function
+        emit(this.id, { sum: this.amount, count: 1 }); // Emit id as key, amount as sum and count as 1
+    },
+    function (key, values) { // Reduce function
+        let result = { sum: 0, count: 0 };
+        values.forEach(value => {
+            result.sum += value.sum;
+            result.count += value.count;
+        });
+        return result;
+    },
+    {
+        out: "avg_amount",
+        finalize: function (key, reducedValue) { // Finalize function to calculate average
+            return reducedValue.sum / reducedValue.count;
+        }
+    }
+);
+
+// View the results
+db.avg_amount.find();
+
+3. Find the Minimum Amount of Each Customer
+
+db.orders.mapReduce(
+    function () { // Map function
+        emit(this.id, this.amount); // Emit customer id as key, amount as value
+    },
+    function (key, values) { // Reduce function
+        return Math.min.apply(null, values); // Find the minimum amount for each customer id
+    },
+    {
+        out: "min_amount"
+    }
+);
+
+// View the results
+db.min_amount.find();
+
+4. Find the Maximum Amount of Each Customer Whose Status is "F"
+
+db.orders.mapReduce(
+    function () { // Map function
+        if (this.status === "F") {
+            emit(this.id, this.amount); // Emit customer id as key, amount as value
+        }
+    },
+    function (key, values) { // Reduce function
+        return Math.max.apply(null, values); // Find the maximum amount for each customer id with status "F"
+    },
+    {
+        out: "max_amount_failed"
+    }
+);
+
+// View the results
+db.max_amount_failed.find();

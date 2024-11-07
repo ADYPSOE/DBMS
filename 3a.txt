@@ -1,0 +1,55 @@
+1. Find the Names (First Name, Last Name) and the Salaries of the Employees Who Have a Higher Salary Than the Employee Whose Last Name is 'Singh':
+
+SELECT e.first_name, e.last_name, e.salary
+FROM Employee e
+WHERE e.salary > (
+    SELECT salary
+    FROM Employee
+    WHERE last_name = 'Singh'
+);
+
+    This query retrieves the first name, last name, and salary of employees whose salary is greater than the salary of the employee with the last name 'Singh'.
+
+2. Find the Names (First Name, Last Name) of the Employees Who Have a Manager and Work for a Department Based in the United States:
+
+SELECT e.first_name, e.last_name
+FROM Employee e
+JOIN Departments d ON e.department_id = d.department_id
+JOIN Locations l ON d.location_id = l.location_id
+WHERE e.manager_id IS NOT NULL
+AND l.country_id = 'US';
+
+    This query returns the names of employees who have a manager and are in a department located in the United States.
+
+3. Find the Names of All Employees Who Work in the IT Department:
+
+SELECT e.first_name, e.last_name
+FROM Employee e
+JOIN Departments d ON e.department_id = d.department_id
+WHERE d.department_name = 'IT';
+
+    This query retrieves the names of all employees working in the "IT" department.
+
+4. Find the Names (First Name, Last Name) and the Salary of Employees Whose Salary is Greater Than the Average Salary:
+
+SELECT e.first_name, e.last_name, e.salary
+FROM Employee e
+WHERE e.salary > (SELECT AVG(salary) FROM Employee);
+
+    This query returns the first name, last name, and salary of employees whose salary is above the average salary in the company.
+
+5. Find the Names (First Name, Last Name) and the Salary of Employees Who Earn More Than the Average Salary and Work in Any of the IT Departments:
+
+SELECT e.first_name, e.last_name, e.salary
+FROM Employee e
+JOIN Departments d ON e.department_id = d.department_id
+WHERE e.salary > (SELECT AVG(salary) FROM Employee)
+AND d.department_name = 'IT';
+
+    This query retrieves the first name, last name, and salary of employees who earn more than the average salary and work in the IT department.
+
+Explanation:
+
+    Subqueries are used to calculate the salary of the employee named 'Singh' or the average salary.
+    JOINs are used to connect the Employee, Departments, and Locations tables to filter employees based on their department and location.
+    In the last two queries, the salary comparison is done with the AVG(salary) function to check for employees above average salary.

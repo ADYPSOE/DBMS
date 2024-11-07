@@ -1,0 +1,52 @@
+1. Find the Names (First Name, Last Name), the Salary of the Employees Who Earn the Same Salary as the Minimum Salary for All Departments:
+
+SELECT e.first_name, e.last_name, e.salary
+FROM Employee e
+WHERE e.salary = (
+    SELECT MIN(salary)
+    FROM Employee
+    WHERE department_id = e.department_id
+);
+
+    This query finds employees whose salary matches the minimum salary within their respective departments.
+
+2. Display the Employee ID, First Name, Last Name, Salary of All Employees Whose Salary is Above Average for Their Departments:
+
+SELECT e.Employee_id, e.first_name, e.last_name, e.salary
+FROM Employee e
+WHERE e.salary > (
+    SELECT AVG(salary)
+    FROM Employee
+    WHERE department_id = e.department_id
+);
+
+    This query retrieves employees whose salary is greater than the average salary for their respective departments.
+
+3. Find the Employee ID, Name (Last Name) Along With Their Manager ID, Manager Name (Last Name):
+
+SELECT e.Employee_id, e.last_name AS employee_last_name, e.manager_id, m.last_name AS manager_last_name
+FROM Employee e
+JOIN Employee m ON e.manager_id = m.Employee_id;
+
+    This query retrieves the employee's ID, their last name, their manager's ID, and the manager's last name. It uses a self-join on the Employee table to match employees with their managers.
+
+4. Find the Names and Hire Date of the Employees Who Were Hired After 'Jones':
+
+SELECT e.first_name, e.last_name, e.hire_date
+FROM Employee e
+WHERE e.hire_date > (
+    SELECT hire_date
+    FROM Employee
+    WHERE last_name = 'Jones'
+);
+
+    This query finds employees who were hired after the employee with the last name 'Jones'. It uses a subquery to retrieve Jones' hire date and compares it with the hire date of other employees.
+
+5. Get the Department Name and Number of Employees in the Department:
+
+SELECT d.department_name, COUNT(e.Employee_id) AS number_of_employees
+FROM Departments d
+JOIN Employee e ON d.Department_id = e.department_id
+GROUP BY d.department_name;
+
+    This query returns the department name and the number of employees in each department. It uses JOIN to link the Departments and Employee tables and COUNT() to get the number of employees per department.

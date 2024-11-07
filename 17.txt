@@ -1,0 +1,69 @@
+Step 1: Create the books Collection
+
+db.createCollection("books");
+
+Step 2: Insert Sample Documents
+
+To test these queries, let’s insert some sample documents:
+
+db.books.insertMany([
+    { TITLE: "MongoDB Basics", DESCRIPTION: "Introduction to MongoDB", AUTHOR: "john", URL: "http://example.com/mongodb-basics", TAGS: ["database", "NoSQL"], LIKES: 100 },
+    { TITLE: "Advanced MongoDB", DESCRIPTION: "Advanced topics in MongoDB", AUTHOR: "john", URL: "http://example.com/advanced-mongodb", TAGS: ["database", "NoSQL", "advanced"], LIKES: 300 },
+    { TITLE: "MongoDB Guide", DESCRIPTION: "Guide to MongoDB", AUTHOR: "john", URL: "http://example.com/mongodb-guide", TAGS: ["guide", "NoSQL"], LIKES: 50 },
+    { TITLE: "Databases 101", DESCRIPTION: "Introduction to databases", AUTHOR: "alice", URL: "http://example.com/databases-101", TAGS: ["database", "intro"], LIKES: 120 },
+    { TITLE: "NoSQL vs SQL", DESCRIPTION: "Comparing NoSQL and SQL databases", AUTHOR: "john", URL: "http://example.com/nosql-vs-sql", TAGS: ["database", "NoSQL", "SQL"], LIKES: 200 }
+]);
+
+Aggregation and Indexing Queries
+1. Find the Number of Books Published by Author john
+
+db.books.aggregate([
+    { $match: { AUTHOR: "john" } },
+    { $count: "number_of_books" }
+]);
+
+2. Find Books Which Have Minimum and Maximum LIKES Published by Author john
+
+To get both the minimum and maximum liked books in a single query:
+
+db.books.aggregate([
+    { $match: { AUTHOR: "john" } },
+    {
+        $facet: {
+            minLikes: [{ $sort: { LIKES: 1 } }, { $limit: 1 }],
+            maxLikes: [{ $sort: { LIKES: -1 } }, { $limit: 1 }]
+        }
+    }
+]);
+
+3. Find the Average Number of LIKES of the Books Published by Author john
+
+db.books.aggregate([
+    { $match: { AUTHOR: "john" } },
+    { $group: { _id: null, average_likes: { $avg: "$LIKES" } } }
+]);
+
+4. Find the First and Last Book Published by Author john
+
+To retrieve the first and last books based on insertion order (assuming they are stored in the order they were added):
+
+db.books.aggregate([
+    { $match: { AUTHOR: "john" } },
+    {
+        $facet: {
+            firstBook: [{ $sort: { _id: 1 } }, { $limit: 1 }],
+            lastBook: [{ $sort: { _id: -1 } }, { $limit: 1 }]
+        }
+    }
+]);
+
+Alternatively, if you want to sort by a specific field, such as TITLE, you can modify the $sort stage.
+5. Create an Index on Author Name
+
+db.books.createIndex({ AUTHOR: 1 });
+
+6. Display the Books Published by Author john and Check if It Uses the Index
+
+To display books by john and verify that MongoDB uses the index:
+
+db.books.find({ AUTHOR: "john" }).explain("executionStats");

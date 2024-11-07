@@ -1,0 +1,66 @@
+Database Schema
+
+-- Employee Table
+CREATE TABLE Employee (
+    Emp_No INT PRIMARY KEY,
+    Emp_Name VARCHAR(255),
+    Designation VARCHAR(255),
+    City VARCHAR(255),
+    Salary DECIMAL(10, 2),
+    Zipcode VARCHAR(10),
+    County VARCHAR(10)
+);
+
+1. Create a Sequence for Emp_No
+
+In Oracle, you can create a sequence to auto-generate values for the Emp_No column.
+
+-- Create a sequence to generate unique employee numbers
+CREATE SEQUENCE emp_no_seq
+START WITH 1
+INCREMENT BY 1
+NOCACHE;
+
+To use this sequence while inserting data into the Employee table:
+
+INSERT INTO Employee (Emp_No, Emp_Name, Designation, City, Salary, Zipcode, County)
+VALUES (emp_no_seq.NEXTVAL, 'John Doe', 'Manager', 'New York', 75000, '10001', '071');
+
+2. Create an Index on County
+
+Creating an index on the County column can improve the query performance when filtering or searching by County.
+
+CREATE INDEX idx_county ON Employee (County);
+
+3. Find the Zip Code Where County = '071' and Check if Index is Used
+
+To find the zip code for County = '071', you can execute this query:
+
+SELECT Zipcode
+FROM Employee
+WHERE County = '071';
+
+To check if the query uses the index, you can use EXPLAIN in MySQL or EXPLAIN PLAN in Oracle:
+In MySQL:
+
+EXPLAIN SELECT Zipcode FROM Employee WHERE County = '071';
+
+In Oracle:
+
+EXPLAIN PLAN FOR SELECT Zipcode FROM Employee WHERE County = '071';
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+Observation:
+If the idx_county index is used, the query plan will show an index scan on idx_county rather than a full table scan. This indicates that the database uses the index to locate the rows with County = '071', resulting in faster query performance.
+4. Create a View for Employees with Salary < 50000 and City = 'Mumbai'
+
+You can create a view to filter employees who have a salary less than 50,000 and are located in Mumbai:
+
+CREATE VIEW Mumbai_Low_Salary_Employees AS
+SELECT Emp_No, Emp_Name, Designation, City, Salary, Zipcode, County
+FROM Employee
+WHERE Salary < 50000 AND City = 'Mumbai';
+
+Now, you can use this view to easily retrieve employees who meet these criteria:
+
+SELECT * FROM Mumbai_Low_Salary_Employees;

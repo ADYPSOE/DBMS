@@ -1,0 +1,21 @@
+CREATE PROCEDURE sal_cur2()  
+BEGIN 
+DECLARE var_eno int(3); 
+DECLARE var_sal int(20);  
+DECLARE exit_loop BOOLEAN;  
+DECLARE c1 CURSOR FOR SELECT eno, salary FROM emp; 
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET exit_loop = TRUE;  
+OPEN c1  
+emp_loop: LOOP  
+FETCH c1 INTO var_eno,var_sal;  
+If sal1 > 4000 then 
+Update emp set salary=var_sal+5000 where eno=var_eno;  
+else  
+Update emp set salary=var_sal+1000 where eno=var_eno; 
+End If;  
+IF exit_loop THEN  
+CLOSE c1; 
+LEAVE emp_loop; 
+END IF; 
+END LOOP emp_loop; 
+END ss

@@ -1,0 +1,76 @@
+-- Step 1: Find the names and salaries of employees who have a higher salary than the employee with last_name 'Singh'
+SELECT e.First_name, e.Last_name, e.Salary
+FROM Employee e
+WHERE e.Salary > (
+    SELECT Salary
+    FROM Employee
+    WHERE Last_name = 'Singh'
+);
+
+-- Step 2: Find the names of employees who have a manager and work for a department based in the United States
+SELECT e.First_name, e.Last_name
+FROM Employee e
+JOIN Departments d ON e.Department_id = d.Department_id
+JOIN Locations l ON d.Location_id = l.Location_id
+WHERE e.manager_id IS NOT NULL AND l.country_id = 'US';
+
+-- Step 3: Find the names of all employees who work in the IT department
+SELECT e.First_name, e.Last_name
+FROM Employee e
+JOIN Departments d ON e.Department_id = d.Department_id
+WHERE d.Department_name = 'IT';
+
+-- Step 4: Find the names and salaries of employees whose salary is greater than the average salary
+SELECT e.First_name, e.Last_name, e.Salary
+FROM Employee e
+WHERE e.Salary > (
+    SELECT AVG(Salary)
+    FROM Employee
+);
+
+-- Step 5: Find the names and salaries of employees who earn more than the average salary and work in any IT department
+SELECT e.First_name, e.Last_name, e.Salary
+FROM Employee e
+JOIN Departments d ON e.Department_id = d.Department_id
+WHERE e.Salary > (
+    SELECT AVG(Salary)
+    FROM Employee
+) AND d.Department_name = 'IT';
+
+-- Step 6: Find the names and salaries of employees who earn the same salary as the minimum salary for all departments
+SELECT e.First_name, e.Last_name, e.Salary
+FROM Employee e
+WHERE e.Salary = (
+    SELECT MIN(Salary)
+    FROM Employee
+);
+
+-- Step 7: Display the employee ID, first name, last name, and salary of employees whose salary is above the average for their departments
+SELECT e.Employee_id, e.First_name, e.Last_name, e.Salary
+FROM Employee e
+JOIN (
+    SELECT Department_id, AVG(Salary) AS Dept_Avg_Salary
+    FROM Employee
+    GROUP BY Department_id
+) dept_avg ON e.Department_id = dept_avg.Department_id
+WHERE e.Salary > dept_avg.Dept_Avg_Salary;
+
+-- Step 8: Find the employee ID, name (last_name), manager ID, and manager's last name
+SELECT e.Employee_id, e.Last_name AS Employee_Last_Name, e.manager_id, m.Last_name AS Manager_Last_Name
+FROM Employee e
+LEFT JOIN Employee m ON e.manager_id = m.Employee_id;
+
+-- Step 9: Find the names and hire dates of employees who were hired after 'Jones'
+SELECT e.First_name, e.Last_name, e.hire_date
+FROM Employee e
+WHERE e.hire_date > (
+    SELECT hire_date
+    FROM Employee
+    WHERE Last_name = 'Jones'
+);
+
+-- Step 10: Get the department name and number of employees in each department
+SELECT d.Department_name, COUNT(e.Employee_id) AS Employee_Count
+FROM Departments d
+LEFT JOIN Employee e ON d.Department_id = e.Department_id
+GROUP BY d.Department_name;

@@ -1,0 +1,60 @@
+Step 1: Creating the Books and Library_Audit Tables
+
+-- Create the Library database (if not already created)
+CREATE DATABASE Library;
+
+-- Use the Library database
+USE Library;
+
+-- Create the Books table
+CREATE TABLE Books (
+    AccNo INT PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    Author VARCHAR(255),
+    Publisher VARCHAR(255),
+    Count INT
+);
+
+-- Create the Library_Audit table with the same schema as Books
+CREATE TABLE Library_Audit (
+    AccNo INT,
+    Title VARCHAR(255),
+    Author VARCHAR(255),
+    Publisher VARCHAR(255),
+    Count INT,
+    Action VARCHAR(10),      -- 'DELETE' or 'UPDATE' action type
+    Action_Time TIMESTAMP    -- Timestamp of action
+);
+
+
+Step 2: Creating the Before Delete Trigger
+
+The before_delete_trigger will be fired before a row is deleted in the Books table, inserting a copy of that row into Library_Audit with an action label DELETE.
+
+DELIMITER //
+
+CREATE TRIGGER before_delete_trigger
+BEFORE DELETE ON Books
+FOR EACH ROW
+BEGIN
+    INSERT INTO Library_Audit (AccNo, Title, Author, Publisher, Count, Action, Action_Time)
+    VALUES (OLD.AccNo, OLD.Title, OLD.Author, OLD.Publisher, OLD.Count, 'DELETE', NOW());
+END //
+
+DELIMITER ;
+
+Step 3: Creating the After Update Trigger
+
+The after_update_trigger will be fired after a row in the Books table is updated, logging the updated row in Library_Audit with an action label UPDATE.
+
+DELIMITER //
+
+CREATE TRIGGER after_update_trigger
+AFTER UPDATE ON Books
+FOR EACH ROW
+BEGIN
+    INSERT INTO Library_Audit (AccNo, Title, Author, Publisher, Count, Action, Action_Time)
+    VALUES (NEW.AccNo, NEW.Title, NEW.Author, NEW.Publisher, NEW.Count, 'UPDATE', NOW());
+END //
+
+DELIMITER ;

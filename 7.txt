@@ -1,0 +1,26 @@
+-- Step 1: Create the WorkCenters table
+CREATE TABLE WorkCenters (
+    id INT NOT NULL, 
+    name VARCHAR(100) NOT NULL,  
+    capacity INT NOT NULL
+);
+
+-- Step 2: Create the WorkCenterStats table
+CREATE TABLE WorkCenterStats (
+    totalCapacity INT NOT NULL
+);
+
+-- Step 3: Insert an initial record in WorkCenterStats
+-- Initialize totalCapacity to 0 to have a base value.
+INSERT INTO WorkCenterStats (totalCapacity) VALUES (0);
+
+-- Step 4: Create a Trigger on WorkCenters
+CREATE OR REPLACE TRIGGER trg_update_totalCapacity
+AFTER INSERT ON WorkCenters
+FOR EACH ROW
+BEGIN
+    -- Update the totalCapacity in WorkCenterStats table
+    UPDATE WorkCenterStats
+    SET totalCapacity = totalCapacity + :NEW.capacity;
+END;
+/

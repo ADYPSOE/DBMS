@@ -1,0 +1,101 @@
+1. Create a collection named books
+
+In MongoDB, collections are automatically created when you insert the first document into them. You can create the collection explicitly with:
+
+db.createCollection("books");
+
+However, typically, collections are created when you insert data.
+2. Insert 5 records with fields TITLE, DESCRIPTION, BY, URL, TAGS, and LIKES
+
+db.books.insertMany([
+    {
+        TITLE: "Learn MongoDB",
+        DESCRIPTION: "An introduction to MongoDB and its features.",
+        BY: "john",
+        URL: "http://example.com/mongodb",
+        TAGS: ["database", "NoSQL"],
+        LIKES: 120
+    },
+    {
+        TITLE: "Advanced MongoDB",
+        DESCRIPTION: "Advanced concepts and techniques in MongoDB.",
+        BY: "alice",
+        URL: "http://example.com/advanced-mongodb",
+        TAGS: ["database", "NoSQL", "advanced"],
+        LIKES: 200
+    },
+    {
+        TITLE: "Introduction to Databases",
+        DESCRIPTION: "A beginner's guide to databases.",
+        BY: "john",
+        URL: "http://example.com/introduction-to-databases",
+        TAGS: ["database", "beginner"],
+        LIKES: 80
+    },
+    {
+        TITLE: "NoSQL Databases",
+        DESCRIPTION: "A deep dive into NoSQL technologies.",
+        BY: "mike",
+        URL: "http://example.com/nosql-databases",
+        TAGS: ["NoSQL", "database"],
+        LIKES: 150
+    },
+    {
+        TITLE: "MongoDB vs SQL",
+        DESCRIPTION: "Comparison between MongoDB and traditional SQL databases.",
+        BY: "jane",
+        URL: "http://example.com/mongodb-vs-sql",
+        TAGS: ["database", "NoSQL", "SQL"],
+        LIKES: 100
+    }
+]);
+
+3. Insert 1 more document in the collection with additional fields user_name and comments
+
+db.books.insertOne({
+    TITLE: "Mastering MongoDB",
+    DESCRIPTION: "A comprehensive guide to MongoDB.",
+    BY: "john",
+    URL: "http://example.com/mastering-mongodb",
+    TAGS: ["NoSQL", "database"],
+    LIKES: 250,
+    user_name: "john_doe",
+    comments: ["Excellent book!", "Highly recommended."]
+});
+
+4. Display all the documents whose title is 'mongodb'
+
+db.books.find({ TITLE: "mongodb" });
+
+5. Display all the documents whose title is 'mongodb' and written by 'john'
+
+db.books.find({ TITLE: "mongodb", BY: "john" });
+
+6. Display all the documents whose LIKES is greater than 100 and whose title is either 'mongodb' or written by 'john'
+
+db.books.find({
+    LIKES: { $gt: 100 },
+    $or: [{ TITLE: "mongodb" }, { BY: "john" }]
+});
+
+7. Delete the document titled 'nosql overview'
+
+db.books.deleteOne({ TITLE: "nosql overview" });
+
+8. Display the second document published by 'john'
+
+To display the second document published by 'john', we can use .skip(1) to skip the first result and .limit(1) to fetch only one document:
+
+db.books.find({ BY: "john" }).skip(1).limit(1);
+
+9. Update the Author of the book titled 'TOC' to 'Vivek Kulkarni', or create a new document if the record does not exist
+
+To achieve this, you can use updateOne with the upsert option. If the document with TITLE: "TOC" doesn't exist, a new one will be created.
+
+db.books.updateOne(
+    { TITLE: "TOC" },
+    { 
+        $set: { BY: "Vivek Kulkarni" }
+    },
+    { upsert: true }  // If the document doesn't exist, it will create a new one.
+);

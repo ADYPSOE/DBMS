@@ -1,0 +1,50 @@
+Database Schema
+
+-- Employee Table
+CREATE TABLE Employee (
+    employee_id INT PRIMARY KEY,
+    employee_name VARCHAR(255),
+    City VARCHAR(255),
+    Company_Name VARCHAR(255),
+    Salary DECIMAL(10, 2)
+);
+
+Queries
+11. Find details of all employees who work for company “IBM” and live in city “Pune”.
+
+SELECT *
+FROM Employee
+WHERE Company_Name = 'IBM' AND City = 'Pune';
+
+12. Find names and cities of all employees who work for “Infosys” or earn more than 30000.
+
+SELECT employee_name, City
+FROM Employee
+WHERE Company_Name = 'Infosys' OR Salary > 30000;
+
+13. Find all employees who are employees of “IBM” and not living in city “Mumbai”.
+
+SELECT *
+FROM Employee
+WHERE Company_Name = 'IBM' AND City != 'Mumbai';
+
+14. Find company-wise maximum salary.
+
+To get the maximum salary for each company, we can use GROUP BY and MAX.
+
+SELECT Company_Name, MAX(Salary) AS Max_Salary
+FROM Employee
+GROUP BY Company_Name;
+
+15. Find those companies whose employees earn a higher average salary than the average salary at “IBM”.
+
+First, calculate the average salary at IBM, then compare it with the average salaries of other companies.
+
+SELECT Company_Name
+FROM Employee
+GROUP BY Company_Name
+HAVING AVG(Salary) > (
+    SELECT AVG(Salary)
+    FROM Employee
+    WHERE Company_Name = 'IBM'
+);

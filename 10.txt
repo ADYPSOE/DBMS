@@ -1,0 +1,104 @@
+Database Schema
+
+-- Student Table
+CREATE TABLE Student (
+    Student_Id INT PRIMARY KEY,
+    Student_Name VARCHAR(255),
+    Instructor_Id INT,
+    Student_City VARCHAR(255)
+);
+
+-- Instructor Table
+CREATE TABLE Instructor (
+    Instructor_Id INT PRIMARY KEY,
+    Instructor_Name VARCHAR(255),
+    Instructor_City VARCHAR(255),
+    Specialization VARCHAR(255)
+);
+
+1. Find the Instructor of Each Student
+
+To find the instructor of each student, we need to join the Student and Instructor tables on Instructor_Id.
+
+SELECT 
+    Student.Student_Id,
+    Student.Student_Name,
+    Instructor.Instructor_Id,
+    Instructor.Instructor_Name
+FROM 
+    Student
+JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id;
+
+2. Find the Student Who is Not Having Any Instructor
+
+To find students without an instructor, we can use a LEFT JOIN and filter out rows where the instructor fields are NULL.
+
+SELECT 
+    Student.Student_Id,
+    Student.Student_Name
+FROM 
+    Student
+LEFT JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id
+WHERE 
+    Instructor.Instructor_Id IS NULL;
+
+3. Find the Student Who is Not Having Any Instructor and Instructor Who is Not Having Any Student
+
+For this, we need two separate queries:
+
+    Students without an instructor (similar to query 2).
+    Instructors without any students.
+
+We can use a LEFT JOIN for both conditions.
+
+-- Students without an instructor
+SELECT 
+    Student.Student_Id,
+    Student.Student_Name
+FROM 
+    Student
+LEFT JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id
+WHERE 
+    Instructor.Instructor_Id IS NULL;
+
+-- Instructors without any students
+SELECT 
+    Instructor.Instructor_Id,
+    Instructor.Instructor_Name
+FROM 
+    Instructor
+LEFT JOIN 
+    Student ON Instructor.Instructor_Id = Student.Instructor_Id
+WHERE 
+    Student.Student_Id IS NULL;
+
+4. Find the Students Whose Instructor’s Specialization is "Computer"
+
+To find students whose instructor has a specialization in "Computer," we can use an INNER JOIN with a filter on Specialization.
+
+SELECT 
+    Student.Student_Id,
+    Student.Student_Name
+FROM 
+    Student
+JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id
+WHERE 
+    Instructor.Specialization = 'Computer';
+
+5. Create a View Containing Total Number of Students Whose Instructor Belongs to “Pune”
+
+To create a view that shows the total count of students whose instructor is based in "Pune," we can use a JOIN and aggregate with COUNT.
+
+CREATE VIEW Pune_Instructor_Student_Count AS
+SELECT 
+    COUNT(Student.Student_Id) AS Total_Students
+FROM 
+    Student
+JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id
+WHERE 
+    Instructor.Instructor_City = 'Pune';

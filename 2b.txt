@@ -1,0 +1,109 @@
+-- Step 1: Create the Employee table
+CREATE TABLE Employee (
+    Employee_id INT PRIMARY KEY,
+    First_name VARCHAR(50),
+    Last_name VARCHAR(50),
+    Salary DECIMAL(10, 2),
+    Joining_date DATE,
+    Department VARCHAR(50)
+);
+
+-- Insert 10 to 15 records into Employee table
+INSERT INTO Employee (Employee_id, First_name, Last_name, Salary, Joining_date, Department) VALUES
+(1, 'Alice', 'Johnson', 25000, '2022-01-15', 'HR'),
+(2, 'Bob', 'Smith', 18000, '2021-06-10', 'IT'),
+(3, 'Charlie', 'Brown', 30000, '2020-11-23', 'Finance'),
+(4, 'David', 'Wilson', 17000, '2023-04-04', 'IT'),
+(5, 'Eve', 'Davis', 50000, '2019-07-19', 'Operations'),
+(6, 'Frank', 'Miller', 22000, '2021-09-12', 'Sales'),
+(7, 'Grace', 'Lee', 45000, '2018-02-05', 'Marketing'),
+(8, 'Hannah', 'Young', 32000, '2020-10-21', 'Finance'),
+(9, 'Ian', 'White', 28000, '2022-03-14', 'HR'),
+(10, 'Judy', 'Clark', 15000, '2023-08-30', 'IT');
+
+-- Step 2: Get First_Name, Last_Name from Employee table
+SELECT First_name, Last_name FROM Employee;
+
+-- Step 3: Get unique Department from Employee table
+SELECT DISTINCT Department FROM Employee;
+
+-- Step 4: Get FIRST_NAME, Joining year, Joining month, and Joining date from Employee table
+SELECT First_name, 
+       YEAR(Joining_date) AS Joining_Year, 
+       MONTH(Joining_date) AS Joining_Month, 
+       DAY(Joining_date) AS Joining_Day
+FROM Employee;
+
+-- Step 5: Get all employee details ordered by Salary in ascending order
+SELECT * FROM Employee ORDER BY Salary ASC;
+
+-- Step 6: Get all employee details where First_Name starts with 'A'
+SELECT * FROM Employee WHERE First_name LIKE 'A%';
+
+-- Step 7: Increment salary by 5000 for employees with Salary less than 20000
+UPDATE Employee 
+SET Salary = Salary + 5000 
+WHERE Salary < 20000;
+
+-- Step 8: Delete the Department of Employee with Employee_id 4
+UPDATE Employee 
+SET Department = NULL 
+WHERE Employee_id = 4;
+
+-- Step 9: Find department-wise minimum salary
+SELECT Department, MIN(Salary) AS Min_Salary 
+FROM Employee 
+GROUP BY Department;
+
+-- Step 10: Find department-wise average salary in ascending order
+SELECT Department, AVG(Salary) AS Avg_Salary 
+FROM Employee 
+GROUP BY Department 
+ORDER BY Avg_Salary ASC;
+
+-- For the following steps, create an additional Employee table schema as described
+CREATE TABLE Employee_Details (
+    Employee_id INT PRIMARY KEY,
+    Employee_name VARCHAR(100),
+    City VARCHAR(50),
+    Company_Name VARCHAR(50),
+    Salary DECIMAL(10, 2)
+);
+
+-- Insert sample data into Employee_Details (examples)
+INSERT INTO Employee_Details (Employee_id, Employee_name, City, Company_Name, Salary) VALUES
+(1, 'Alice', 'Pune', 'IBM', 25000),
+(2, 'Bob', 'Mumbai', 'Infosys', 35000),
+(3, 'Charlie', 'Pune', 'IBM', 30000),
+(4, 'David', 'Chennai', 'TCS', 27000),
+(5, 'Eve', 'Bangalore', 'Infosys', 32000);
+
+-- Step 11: Find details of all employees who work for IBM and live in Pune
+SELECT * FROM Employee_Details 
+WHERE Company_Name = 'IBM' AND City = 'Pune';
+
+-- Step 12: Find names and cities of all employees who work for Infosys or earn more than 30000
+SELECT Employee_name, City 
+FROM Employee_Details 
+WHERE Company_Name = 'Infosys' OR Salary > 30000;
+
+-- Step 13: Find all employees who are employees of IBM and not living in Mumbai
+SELECT * FROM Employee_Details 
+WHERE Company_Name = 'IBM' AND City <> 'Mumbai';
+
+-- Step 14: Find company-wise maximum salary
+SELECT Company_Name, MAX(Salary) AS Max_Salary 
+FROM Employee_Details 
+GROUP BY Company_Name;
+
+-- Step 15: Find companies whose employees earn a higher salary than the average salary at IBM
+-- First, calculate the average salary of IBM employees
+WITH IBMSalaryAvg AS (
+    SELECT AVG(Salary) AS Avg_Salary 
+    FROM Employee_Details 
+    WHERE Company_Name = 'IBM'
+)
+SELECT Company_Name 
+FROM Employee_Details, IBMSalaryAvg
+WHERE Salary > IBMSalaryAvg.Avg_Salary
+GROUP BY Company_Name;

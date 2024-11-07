@@ -1,0 +1,102 @@
+1. Set Up JDBC Driver Dependency (for Maven projects)
+
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+</dependency>
+
+
+2. Sample Java Program for CRUD Operations
+
+The code below demonstrates how to connect to the database and implement CRUD operations.
+
+import java.sql.*;
+
+public class DatabaseOperations {
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/your_database";
+    private static final String USER = "your_username";
+    private static final String PASS = "your_password";
+    
+    private Connection conn;
+
+    public DatabaseOperations() {
+        try {
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            System.out.println("Database connection established.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addRecord(String name, int age) {
+        String query = "INSERT INTO employees (name, age) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, name);
+            stmt.setInt(2, age);
+            stmt.executeUpdate();
+            System.out.println("Record added.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readRecords() {
+        String query = "SELECT * FROM employees";
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getInt("id") + ", Name: " + rs.getString("name") + ", Age: " + rs.getInt("age"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateRecord(int id, String name, int age) {
+        String query = "UPDATE employees SET name = ?, age = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, name);
+            stmt.setInt(2, age);
+            stmt.setInt(3, id);
+            stmt.executeUpdate();
+            System.out.println("Record updated.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteRecord(int id) {
+        String query = "DELETE FROM employees WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            System.out.println("Record deleted.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeConnection() {
+        try {
+            if (conn != null) {
+                conn.close();
+                System.out.println("Database connection closed.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        DatabaseOperations dbOps = new DatabaseOperations();
+
+        // Perform CRUD operations
+        dbOps.addRecord("Alice", 30); // Create
+        dbOps.readRecords();          // Read
+        dbOps.updateRecord(1, "Alice Smith", 32); // Update
+        dbOps.deleteRecord(1);        // Delete
+
+        dbOps.closeConnection();
+    }
+}

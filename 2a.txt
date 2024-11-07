@@ -1,0 +1,97 @@
+
+
+
+-- Step 1: Create the tables and insert data
+CREATE TABLE Student (
+    StudID INT,
+    Name VARCHAR(50),
+    Address VARCHAR(100),
+    Marks INT
+);
+
+CREATE TABLE Employee (
+    EmployeeID INT,
+    Name VARCHAR(50),
+    Address VARCHAR(100),
+    Salary DECIMAL(10, 2),
+    DateOfJoining DATE,
+    Department VARCHAR(50)
+);
+
+CREATE TABLE Weather (
+    CityID INT,
+    CityName VARCHAR(50),
+    MinTemp DECIMAL(4, 1),
+    MaxTemp DECIMAL(4, 1)
+);
+
+-- Insert data into the tables (examples)
+INSERT INTO Student (StudID, Name, Address, Marks) VALUES (1, 'Alice', '123 Main St', 85);
+INSERT INTO Student (StudID, Name, Address, Marks) VALUES (2, 'Bob', '456 Maple Ave', 92);
+-- Add more data as needed...
+
+INSERT INTO Employee (EmployeeID, Name, Address, Salary, DateOfJoining, Department) VALUES (1, 'John Doe', '789 Elm St', 55000.00, '2023-01-15', 'HR');
+-- Add more data as needed...
+
+INSERT INTO Weather (CityID, CityName, MinTemp, MaxTemp) VALUES (1, 'New York', -3.5, 10.2);
+-- Add more data as needed...
+
+-- Step 2: Alter tables to add NOT NULL constraint
+ALTER TABLE Student 
+MODIFY StudID INT NOT NULL,
+MODIFY Name VARCHAR(50) NOT NULL,
+MODIFY Address VARCHAR(100) NOT NULL,
+MODIFY Marks INT NOT NULL;
+
+ALTER TABLE Employee 
+MODIFY EmployeeID INT NOT NULL,
+MODIFY Name VARCHAR(50) NOT NULL,
+MODIFY Address VARCHAR(100) NOT NULL,
+MODIFY Salary DECIMAL(10, 2) NOT NULL,
+MODIFY DateOfJoining DATE NOT NULL,
+MODIFY Department VARCHAR(50) NOT NULL;
+
+-- Step 3: Add Primary key constraint on StudID column
+ALTER TABLE Student
+ADD PRIMARY KEY (StudID);
+
+-- Step 4: Create a view JoiningInfo on Employee table
+CREATE VIEW JoiningInfo AS
+SELECT EmployeeID, Name, DateOfJoining
+FROM Employee;
+
+-- Step 5: Create index on primary key columns of all the tables
+CREATE INDEX idx_student_studid ON Student (StudID);
+CREATE INDEX idx_employee_employeeid ON Employee (EmployeeID);
+CREATE INDEX idx_weather_cityid ON Weather (CityID);
+
+-- Step 6: Create a view MarksInfo on Student table
+CREATE VIEW MarksInfo AS
+SELECT StudID, Marks
+FROM Student;
+
+-- Step 7: Rename Weather table to WeatherData
+ALTER TABLE Weather RENAME TO WeatherData;
+
+-- Step 8: Drop column CityName from WeatherData table
+ALTER TABLE WeatherData
+DROP COLUMN CityName;
+
+-- Step 9: Add column Grade to Student table
+ALTER TABLE Student
+ADD Grade VARCHAR(10);
+
+-- Step 10: Create view DistinctionStudents on Student table for students with Grade 'Distinction'
+CREATE VIEW DistinctionStudents AS
+SELECT * 
+FROM Student
+WHERE Grade = 'Distinction';
+
+-- Step 11: Create a sequence on StudID in Student table
+CREATE SEQUENCE studid_seq
+START WITH 1
+INCREMENT BY 1
+MINVALUE 1;
+
+-- Step 12: Create a synonym ‘Emp_Info’ for Employee table
+CREATE SYNONYM Emp_Info FOR Employee;
